@@ -19,8 +19,10 @@ impl WalletAuthId {
         nacl::sign::verify(
             &self.signature.as_slice(),
             &self.message.as_slice(),
-            self.public_key.as_ref(),
+            solana_sdk::pubkey::Pubkey::from_str(self.public_key.as_str())
+                .map_err(AuthIdError::from_general)?
+                .as_ref(),
         )
-        .map_err(|z| AuthIdError::GeneralError(format!("invalid wallet")))
+        .map_err(|z| AuthIdError::GeneralError(z.message))
     }
 }
